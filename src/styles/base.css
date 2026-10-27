@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body {
+    margin: 0;
+    background: #ffffff;
+  }
+  body {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+    font-feature-settings: "cv11", "ss03";
+  }
+}
+
+@layer components {
+  .kicker {
+    @apply inline-flex items-center gap-3 self-start rounded-full bg-accent/10 px-6 py-3 text-[26px] font-bold uppercase leading-none tracking-[0.1em] text-accent-ink;
+  }
+  .kicker::before {
+    content: "";
+    @apply h-3 w-3 rounded-full bg-accent;
+  }
+
+  /* Título condensado (Anton / League Gothic): sempre maiúsculo, peso único. */
+  .h-title {
+    @apply font-display font-normal uppercase leading-[0.94] tracking-[0.005em] text-ink;
+  }
+  .subtitle {
+    @apply text-[38px] font-medium leading-[1.3] tracking-[-0.01em] text-neutral-500;
+  }
+
+  .tag {
+    @apply inline-flex items-center whitespace-nowrap rounded-full px-4 py-2 text-[24px] font-semibold leading-none tracking-[-0.005em];
+  }
+  .tag-accent { @apply bg-accent text-white; }
+  .tag-soft   { @apply bg-accent/15 text-accent-ink; }
+  .tag-gray   { @apply bg-neutral-100 text-neutral-600; }
+  .tag-dark   { @apply bg-ink text-white; }
+  .tag-red    { @apply bg-red-50 text-red-600; }
+  .tag-amber  { @apply bg-amber-50 text-amber-700; }
+  .tag-blue   { @apply bg-sky-50 text-sky-700; }
+
+  .tier-accent { @apply bg-accent text-white; }
+  .tier-soft   { @apply bg-accent/15 text-accent-ink; }
+  .tier-dark   { @apply bg-ink text-white; }
+  .tier-gray   { @apply bg-neutral-200 text-neutral-600; }
+  .tier-muted  { @apply bg-neutral-100 text-neutral-400; }
+}

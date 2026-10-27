@@ -1,0 +1,33 @@
+{
+  "name": "tiktok-slide-generator",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Gerador de carrosséis 1080x1920 (estilo Arrow) a partir de JSON, com Tailwind + Playwright",
+  "scripts": {
+    "setup": "playwright install chromium",
+    "render": "tsx src/index.ts",
+    "render:html": "tsx src/index.ts --html",
+    "render:guides": "tsx src/index.ts --guides",
+    "figures": "tsx src/figures.ts",
+    "prep:bases": "tsx scripts/prep-bases.ts",
+    "grid": "tsx scripts/grid.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.1.1",
+    "@fontsource/anton": "^5.3.0",
+    "@fontsource/league-gothic": "^5.3.0",
+    "@types/pngjs": "^6.0.5",
+    "playwright": "^1.49.1",
+    "pngjs": "^7.0.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

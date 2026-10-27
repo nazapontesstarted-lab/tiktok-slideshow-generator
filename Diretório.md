@@ -1,0 +1,1 @@
+O objetivo desse diretório é conseguir criar um sistema para criação de slideshow interessantes sobre o nicho de fitness para o TikTok e Instagram.

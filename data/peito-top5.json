@@ -1,0 +1,83 @@
+{
+  "id": "peito-top5",
+  "theme": { "accent": "#22c55e", "handle": "@seuperfil" },
+  "hook": {
+    "kicker": "Guia de treino",
+    "title": "Os 5 melhores\npara {peito}",
+    "subtitle": "Ranqueados por ativação, sobrecarga e segurança.",
+    "muscles": { "primary": ["peito"], "secondary": ["deltoide-anterior"] },
+    "view": "front"
+  },
+  "slides": [
+    {
+      "type": "anatomy",
+      "kicker": "Anatomia",
+      "title": "Quem trabalha no {supino}",
+      "muscles": { "primary": ["chest"], "secondary": ["front-delts", "triceps"] },
+      "view": "both",
+      "layout": "stacked",
+      "labels": [
+        { "muscle": "chest", "text": "Peitoral maior", "note": "Motor principal" },
+        { "muscle": "front-delts", "text": "Deltoide anterior", "note": "Auxilia a empurrar" },
+        { "muscle": "triceps", "text": "Tríceps", "note": "Estende o cotovelo" }
+      ]
+    },
+    {
+      "type": "tierlist",
+      "kicker": "Tier list",
+      "title": "Exercícios de {peito}",
+      "tiers": [
+        { "tier": "S", "items": [{ "name": "Supino inclinado", "tag": "Halter" }, { "name": "Crucifixo", "tag": "Cabo" }] },
+        { "tier": "A", "items": [{ "name": "Supino reto", "tag": "Barra" }, { "name": "Paralelas", "tag": "Peso corporal" }] },
+        { "tier": "B", "items": [{ "name": "Peck deck", "tag": "Máquina" }, "Supino máquina"] },
+        { "tier": "C", "items": ["Crucifixo c/ halter", "Flexão"] },
+        { "tier": "D", "items": [{ "name": "Pullover", "tag": { "label": "Pouco peito", "color": "red" } }] }
+      ]
+    },
+    {
+      "type": "ranking",
+      "kicker": "Ranking",
+      "title": "Top 5 para {hipertrofia}",
+      "items": [
+        { "name": "Supino inclinado", "description": "Ênfase na porção clavicular", "score": 9.6, "tags": ["Halter", { "label": "Composto", "color": "gray" }], "muscles": { "primary": ["chest"], "secondary": ["front-delts"] } },
+        { "name": "Crucifixo no cabo", "description": "Tensão constante na amplitude toda", "score": 9.2, "tags": ["Cabo", { "label": "Isolado", "color": "gray" }], "muscles": { "primary": ["chest"] } },
+        { "name": "Supino reto", "description": "Rei da sobrecarga progressiva", "score": 8.9, "tags": ["Barra", { "label": "Composto", "color": "gray" }], "muscles": { "primary": ["chest"], "secondary": ["front-delts", "triceps"] } },
+        { "name": "Paralelas", "description": "Tronco inclinado à frente", "score": 8.5, "tags": ["Peso corporal"], "muscles": { "primary": ["chest", "triceps"], "secondary": ["front-delts"] } },
+        { "name": "Peck deck", "description": "Ótimo para finalizar", "score": 8.1, "tags": ["Máquina"], "muscles": { "primary": ["chest"] } }
+      ]
+    },
+    {
+      "type": "exercise",
+      "rank": 1,
+      "name": "Supino {inclinado}",
+      "description": "Banco a 30°, desça o halter até a linha do peito.",
+      "tags": ["Halter", { "label": "Composto", "color": "gray" }],
+      "muscles": { "primary": ["upper-chest"], "secondary": ["mid-chest", "front-delts"] },
+      "view": "front",
+      "target": "Peitoral superior",
+      "sets": 4,
+      "reps": "8–12",
+      "rest": "90s",
+      "benefits": ["Peito superior mais cheio", "Ombros trabalham menos que no reto"]
+    },
+    {
+      "type": "list",
+      "kicker": "Evite",
+      "title": "Erros que {travam} seu peito",
+      "style": "cross",
+      "items": [
+        { "title": "Cotovelos a 90°", "text": "Mantenha entre 45° e 60° para proteger o ombro." },
+        { "title": "Quicar a barra no peito", "text": "Controle a descida e faça uma pausa curta." },
+        { "title": "Tirar a escápula do banco", "text": "Escápulas retraídas e deprimidas o tempo todo." },
+        { "title": "Só treinar supino reto", "text": "Varie ângulos: inclinado, cabo e paralelas." }
+      ]
+    },
+    {
+      "type": "cta",
+      "title": "Salve e use no {próximo treino}",
+      "subtitle": "Siga para mais guias de anatomia e tier lists toda semana.",
+      "button": "Salvar treino",
+      "icon": "bookmark"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "rosca-martelo",
+  "theme": {
+    "accent": "#e0a526",
+    "handle": "@seuperfil",
+    "figure": { "style": "illustration" }
+  },
+  "hook": {
+    "kicker": "Braços",
+    "title": "Mais braço\nrosca {martelo}",
+    "subtitle": "O exercício que faltava no seu treino.",
+    "highlight": [{ "muscles": ["forearms", "biceps"], "color": "accent" }],
+    "view": "front"
+  },
+  "slides": [
+    {
+      "type": "exercise",
+      "rank": 2,
+      "name": "Rosca {martelo}",
+      "description": "Pegada neutra, cotovelos colados ao corpo.",
+      "tags": ["Halter", { "label": "Isolado", "color": "gray" }],
+      "highlight": [{ "muscles": ["forearms", "biceps"], "color": "accent" }],
+      "view": "front",
+      "target": "Braquial + braquiorradial",
+      "sets": 3,
+      "reps": "10–12",
+      "rest": "60s",
+      "benefits": ["Braço mais grosso", "Mais força de pegada"]
+    },
+    {
+      "type": "anatomy",
+      "kicker": "Anatomia",
+      "title": "Costas em {3 camadas}",
+      "view": "back",
+      "highlight": [
+        { "muscles": ["lats", "teres"], "color": "accent", "label": "Largura", "note": "Dorsal e redondo maior" },
+        { "muscles": ["traps", "rear-delts"], "color": "#f2cf7a", "label": "Espessura", "note": "Trapézio e deltoide posterior" },
+        { "muscles": ["lower-back"], "color": "#9a6b12", "label": "Estabilidade", "note": "Lombar" }
+      ]
+    }
+  ]
+}

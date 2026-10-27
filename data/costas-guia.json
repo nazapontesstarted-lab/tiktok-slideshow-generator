@@ -1,0 +1,134 @@
+{
+  "id": "costas-guia",
+  "theme": {
+    "accent": "#22c55e",
+    "handle": "@seuperfil"
+  },
+  "hook": {
+    "kicker": "Anatomia",
+    "title": "Costas largas\nguia {completo}",
+    "subtitle": "O que treinar para largura e espessura.",
+    "view": "back",
+    "highlight": [
+      { "muscles": ["lats", "teres"], "color": "accent" },
+      { "muscles": ["traps", "rear-delts"], "color": "accent-soft" }
+    ]
+  },
+  "slides": [
+    {
+      "type": "anatomy",
+      "kicker": "Mapa muscular",
+      "title": "O que forma suas {costas}",
+      "view": "auto",
+      "highlight": [
+        {
+          "muscles": [
+            "lats",
+            "teres"
+          ],
+          "color": "accent",
+          "label": "Largura",
+          "note": "Dorsal e redondo maior"
+        },
+        {
+          "muscles": [
+            "traps",
+            "rear-delts"
+          ],
+          "color": "blue",
+          "label": "Espessura",
+          "note": "Trapézio e deltoide posterior"
+        },
+        {
+          "muscles": [
+            "lower-back"
+          ],
+          "color": "amber",
+          "label": "Estabilidade",
+          "note": "Eretores da lombar"
+        },
+        {
+          "muscles": [
+            "biceps",
+            "forearms"
+          ],
+          "color": "accent-soft",
+          "label": "Auxiliares",
+          "note": "Bíceps e antebraço"
+        }
+      ]
+    },
+    {
+      "type": "tierlist",
+      "kicker": "Tier list",
+      "title": "Exercícios de {costas}",
+      "tiers": [
+        {
+          "tier": "S",
+          "items": [
+            {
+              "name": "Barra fixa",
+              "tag": "Peso corporal"
+            },
+            {
+              "name": "Remada curvada",
+              "tag": "Barra"
+            }
+          ]
+        },
+        {
+          "tier": "A",
+          "items": [
+            {
+              "name": "Puxada alta",
+              "tag": "Cabo"
+            },
+            {
+              "name": "Remada serrote",
+              "tag": "Halter"
+            }
+          ]
+        },
+        {
+          "tier": "B",
+          "items": [
+            "Remada baixa",
+            "Pulldown braço reto"
+          ]
+        },
+        {
+          "tier": "C",
+          "items": [
+            "Remada máquina"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "list",
+      "kicker": "Dicas",
+      "title": "Como sentir mais o {dorsal}",
+      "style": "check",
+      "items": [
+        {
+          "title": "Puxe com os cotovelos",
+          "text": "Pense em levar o cotovelo até o bolso."
+        },
+        {
+          "title": "Pegada com straps",
+          "text": "A pegada não deve ser o limite da série."
+        },
+        {
+          "title": "Alongue no topo",
+          "text": "Deixe a escápula subir antes de puxar."
+        }
+      ]
+    },
+    {
+      "type": "cta",
+      "title": "Manda pro seu {parceiro de treino}",
+      "button": "Compartilhar",
+      "icon": "share"
+    }
+  ]
+}
