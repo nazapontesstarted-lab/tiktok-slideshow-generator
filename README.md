@@ -14,22 +14,28 @@ npm run render                         # renderiza todos os data/*.json
 npm run render -- data/peito-top5.json # um arquivo específico
 npm run render:html                    # também salva o .html de cada slide (debug)
 npm run render:guides                  # sobrepõe as áreas cobertas pela UI do TikTok
+npm run render:final -- data/x.json    # versão para postar, em output/
 npm run typecheck                      # confere os tipos (tsc --noEmit)
 npm run figures                        # SVGs avulsos + mapa de músculos em out/figures
-npm run prep:bases                     # gera máscara e figura transparente a partir de assets/base-*.png
-npm run grid -- front 130 230 510 400 overlay   # recorte com grade para traçar músculos
+npm run prep:poses                     # gera figura e máscaras dos músculos a partir de assets/poses
+npm run grid -- neutral-front 130 230 510 400 overlay   # recorte com grade e as máscaras pintadas
 ```
 
-Saída: `out/<id>/01-cover.png`, `02-anatomy.png`, … Os arquivos antigos da mesma pasta são apagados a cada render.
+Saída: `out/<id>/01-cover.png`, `02-anatomy.png`, …
 
-Exemplos prontos em `data/`: `peito-top5.json` (todos os tipos de slide), `costas-guia.json` (vista de costas e grupos coloridos) e `rosca-martelo.json` (tema dourado, no estilo da referência).
+- **`out/`**: testes e conferência. É onde `render`, `render:html` e `render:guides` salvam.
+- **`output/`**: só os slideshows que vão ser postados. É onde `render:final` salva. Ele não aceita `--guides` nem `--html`, para não ir guia ou HTML de debug para a pasta de postagem.
+
+Os arquivos antigos da mesma pasta são apagados a cada render.
+
+Exemplos prontos em `data/`: `peito-top5.json` (todos os tipos de slide), `costas-guia.json` (vista de costas e grupos coloridos) e `rosca-martelo.json` (no estilo da referência). O destaque padrão é o vermelho `#e11d2e`.
 
 ## Estrutura do JSON
 
 ```json
 {
   "id": "peito-top5",
-  "theme": { "accent": "#22c55e", "handle": "@seuperfil", "titleFont": "anton", "cta": "SALVE ISSO {PARA DEPOIS!}" },
+  "theme": { "accent": "#e11d2e", "handle": "@seuperfil", "titleFont": "anton", "cta": "SALVE ISSO {PARA DEPOIS!}" },
   "hook": { "title": "Os 5 melhores\npara {peito}", "muscles": { "primary": ["chest"] }, "view": "front" },
   "slides": [ { "type": "exercise", ... } ]
 }
@@ -47,11 +53,11 @@ Em qualquer título, `{palavra}` fica na cor de destaque e `\n` quebra a linha.
 
 | type       | Campos principais |
 |------------|-------------------|
-| `cover`    | `kicker`, `title`, `subtitle`, `swipe`, figura (`muscles` ou `highlight`), `view` (normalmente via `hook`) |
+| `cover`    | `kicker`, `title`, `subtitle`, `swipe`, figura (`muscles` ou `highlight`), `view`, `pose` (normalmente via `hook`) |
 | `anatomy`  | `kicker`, `title`, `subtitle`, figura, `view`, `layout`, `labels?: [{ muscle, text, note }]` (se omitido, a legenda é gerada a partir dos grupos de destaque) |
 | `tierlist` | `title`, `tiers: [{ tier: "S", style?, items: ["Nome" \| { name, tag }] }]` |
 | `ranking`  | `title`, `thumbnails`, `items: [{ name, description, score (0-10), tags, muscles ou highlight }]` (máx. 6; a miniatura usa a vista em que o músculo aparece melhor) |
-| `exercise` | `rank`, `name`, `description`, `tags`, figura, `view`, `target`, `sets`, `reps`, `rest`, `benefits`, `layout`, `stats?: [{ label, value (0-10) }]` (só no layout `stacked`) |
+| `exercise` | `rank`, `name`, `description`, `tags`, figura, `view`, `pose`, `target`, `sets`, `reps`, `rest`, `benefits`, `layout`, `stats?: [{ label, value (0-10) }]` (só no layout `stacked`) |
 | `list`     | `title`, `style: number \| check \| cross`, `items: ["texto" \| { title, text }]` |
 | `cta`      | `title`, `subtitle`, `button`, `icon: bookmark \| share \| follow` |
 
@@ -60,12 +66,12 @@ Em qualquer título, `{palavra}` fica na cor de destaque e `\n` quebra a linha.
 ### Estilo (`theme.figure`)
 
 ```json
-"theme": { "accent": "#e0a526", "figure": { "style": "illustration" } }
+"theme": { "accent": "#e11d2e", "figure": { "style": "illustration" } }
 ```
 
 | style | Visual |
 |-------|--------|
-| `illustration` (padrão) | Ilustração raster (`assets/base-front.png` e `base-back.png`) com os músculos destacados pintados por cima. A cor é multiplicada sobre o desenho, então o traço, o pontilhado e as linhas de definição continuam visíveis. |
+| `illustration` (padrão) | Ilustração raster de uma pose (`assets/poses/`) com os músculos destacados pintados por cima. A cor é multiplicada sobre o desenho, então o traço e o sombreamento continuam visíveis. |
 | `lineart` | Ilustração vetorial gerada por código, no estilo de infográfico de academia. Não depende de imagens. |
 | `flat` | Silhueta cinza com músculos chapados (estilo app Arrow). |
 
@@ -73,11 +79,23 @@ Em qualquer título, `{palavra}` fica na cor de destaque e `\n` quebra a linha.
 
 ### Como o estilo `illustration` funciona
 
-- **Imagens base**: `assets/base-front.png` e `assets/base-back.png` (768×1376), geradas fora do projeto. As duas precisam ter a mesma pose e o mesmo enquadramento.
-- **Regiões dos músculos**: ficam em `src/anatomy/photo-data.ts`, em coordenadas da imagem. Cada região descreve só o lado esquerdo, e o direito é espelhado em x=384.
-- **Máscara do corpo**: `npm run prep:bases` gera `assets/mask-*.png` (silhueta) e `assets/figure-*.png` (ilustração com fundo transparente). A máscara recorta a cor no contorno, então a cor nunca vaza para fora do corpo. Rode esse comando sempre que trocar as imagens base.
-- **Ajustar ou criar regiões**: `npm run grid -- front 130 230 510 400` gera um recorte com grade de coordenadas em `out/grid/`. Acrescentando `overlay`, mostra as regiões já traçadas, cada uma numa cor. Funciona para `front` e `back`.
-- **Músculos cobertos pelo shorts** (`quads`, `adductors`, `glutes`, `hamstrings`): a parte debaixo do shorts é indicada tingindo o shorts com a cor do músculo, porque a ilustração não mostra a anatomia ali. A parte visível, abaixo da barra, é pintada normalmente.
+- **Poses**: cada pose tem duas imagens em `assets/poses/` (768×1376, fundo branco):
+  - `<pose>.png`: a ilustração em tons de cinza.
+  - `<pose>.map.png`: a mesma pose, alinhada ao pixel, com cada músculo numa cor chapada.
+
+  Hoje existem `neutral-front` e `neutral-back`, registradas em `src/anatomy/poses.ts`.
+- **Processamento**: `npm run prep:poses` lê o mapa de cores e gera em `assets/poses/<pose>/` a figura com fundo transparente, uma máscara por músculo e o `meta.json` com os recortes.
+  - A tabela cor → músculo e os ajustes de cada pose ficam em `scripts/prep-poses.ts`. Um exemplo de ajuste é dividir o peitoral em superior e médio.
+  - Rode esse comando sempre que trocar uma imagem.
+- **Conferir as regiões**: `npm run grid -- neutral-front 0 0 768 1376 overlay` gera em `out/grid/` um recorte com grade de coordenadas e cada máscara pintada numa cor. `front` e `back` também funcionam como atalho da pose neutra.
+- **Pose no slide**: `cover` e `exercise` aceitam `"pose": "<nome>"`. Com `pose`, a vista é a da pose. Sem `pose`, o slide usa a pose neutra da vista escolhida.
+- **Glúteo**: fica todo debaixo do shorts. A região dele é o próprio shorts, tingido com a cor do músculo e sem multiplicar, porque a cor multiplicada sobre o preto não apareceria.
+
+#### Como adicionar uma pose
+1. Gere a ilustração e o mapa de cores com o mesmo personagem e o mesmo enquadramento. Salve como `assets/poses/<pose>.png` e `assets/poses/<pose>.map.png`.
+2. Registre a pose em `POSES` (`src/anatomy/poses.ts`), com a vista dela.
+3. Em `scripts/prep-poses.ts`, adicione a paleta (cor → músculo) e, se precisar, os ajustes e os `holes`. `holes` são pontos brancos fechados pelo desenho que são fundo, como o vão entre o braço e o tronco.
+4. Rode `npm run prep:poses <pose>` e confira com `npm run grid -- <pose> 0 0 768 1376 overlay`.
 
 Os slides `cover`, `anatomy`, `exercise` e os itens de `ranking` aceitam dois formatos de destaque, que podem ser combinados:
 
@@ -108,17 +126,17 @@ Os slides `cover`, `anatomy`, `exercise` e os itens de `ranking` aceitam dois fo
 Em todos os estilos, cada músculo destacado é um grupo com `id` e `data-muscle`, e a cor vem da variável `--hl`:
 
 ```html
-<!-- illustration (padrão): viewBox em coordenadas da imagem (768x1376) -->
-<svg class="anatomy anatomy--illustration" data-view="back" viewBox="120 60 528 1275">
-  <defs><mask id="mk-back">…máscara do corpo…</mask></defs>
-  <image href="data:image/png;base64,…"/>            <!-- assets/figure-back.png -->
-  <g class="muscles" mask="url(#mk-back)">           <!-- mix-blend-mode: multiply -->
-    <g id="lats" class="muscle is-active" data-muscle="lats" style="--hl:#22c55e">
+<!-- illustration (padrão): viewBox em coordenadas da imagem (768x1376), a partir do bbox do corpo -->
+<svg class="anatomy anatomy--illustration" data-view="back" data-pose="neutral-back" viewBox="116 36 538 1304">
+  <defs><mask id="mm-neutral-back-lats">…assets/poses/neutral-back/lats.png…</mask></defs>
+  <image href="data:image/png;base64,…"/>            <!-- assets/poses/neutral-back/figure.png -->
+  <g class="muscles">                                 <!-- mix-blend-mode: multiply -->
+    <g id="lats" class="muscle is-active" data-muscle="lats" style="--hl:#e11d2e">
       <title>Dorsal</title>
-      <path data-side="left" d="…"/><path data-side="right" d="…"/>
+      <rect x="…" y="…" width="…" height="…" mask="url(#mm-neutral-back-lats)"/>
     </g>
   </g>
-  <g class="muscles muscles--over">…shorts tingido…</g>   <!-- só se houver músculo coberto pelo shorts -->
+  <g class="muscles muscles--over">…shorts tingido…</g>   <!-- só com glúteo destacado -->
 </svg>
 
 <!-- lineart e flat: viewBox 200x460, só a metade esquerda é desenhada e a direita é espelhada -->
@@ -134,7 +152,7 @@ Em todos os estilos, cada músculo destacado é um grupo com `id` e `data-muscle
 - **illustration**: só os músculos destacados viram elementos, porque o resto já está desenhado na imagem.
 - **lineart e flat**: todos os músculos aparecem, e os não destacados ficam cinza (`#dcdfe5`) ou brancos.
 - **IDs repetidos**: quando a frente e as costas aparecem na mesma página, os IDs se repetem (ex.: `traps`). Para estilizar via CSS ou JS, use `[data-muscle="…"]`.
-- **Uso direto em código**: `anatomySvg({ view, highlights, focus, style, standalone })` em `src/anatomy/figure.ts`.
+- **Uso direto em código**: `anatomySvg({ view, pose, highlights, focus, style, standalone })` em `src/anatomy/figure.ts`.
 - **SVGs avulsos**: `npm run figures` gera `anatomy-{front,back}-{illustration,lineart,flat}.svg`, sem destaque e com o CSS embutido.
 
 **Tags**: `"Halter"` (estilo `soft`) ou `{ "label": "Pouco peito", "color": "red" }`. As cores disponíveis são `accent, soft, gray, dark, red, amber, blue`.
@@ -153,30 +171,28 @@ src/
   anatomy/
     registry.ts       IDs, nomes em PT, melhor vista, grupos e aliases
     figure.ts         anatomySvg(), cores, view "auto", foco; renderiza os 3 estilos
-    photo.ts          estilo illustration: imagens em base64, espelhamento, lookup dos músculos
-    photo-geom.ts     smooth(), tipos PhotoPart/PhotoSet
-    photo-data.ts     regiões dos músculos sobre as imagens base (coordenadas da imagem)
+    poses.ts          estilo illustration: registro das poses, meta.json e imagens em base64
     paths.ts          estilos lineart/flat: silhueta e músculos vetoriais; mirror() espelha paths
   css.ts              compila o Tailwind usando o HTML gerado como content; embute a Inter e a fonte dos títulos em base64
   ui.ts               moldura 1080x1920, header, helpers (tag, heading, figure)
   templates/          um arquivo por tipo de slide
   styles/base.css     componentes Tailwind (@apply)
 scripts/
-  prep-bases.ts       gera máscara e figura transparente a partir de assets/base-*.png
-  grid.ts             recorte com grade de coordenadas, com ou sem overlay dos músculos
-assets/
-  base-*.png          imagens originais (frente e costas), mesma pose e enquadramento
-  mask-*.png          silhueta do corpo (gerada)
-  figure-*.png        ilustração com fundo transparente (gerada)
+  prep-poses.ts       mapa de cores → máscaras dos músculos; paleta e ajustes de cada pose
+  grid.ts             recorte com grade de coordenadas, com ou sem overlay das máscaras
+assets/poses/
+  <pose>.png          ilustração original (tons de cinza, fundo branco)
+  <pose>.map.png      mesma pose com cada músculo numa cor chapada
+  <pose>/             gerado: figure.png (fundo transparente), <musculo>.png e meta.json
 data/                 carrosséis em JSON
 out/                  PNGs gerados (não versionado)
 ```
 
 ### Como alterar a figura
 
-- **Trocar as imagens base** (`illustration`): substitua `assets/base-front.png` e `assets/base-back.png` por imagens de **mesma proporção, pose e enquadramento** (a frente e as costas precisam se sobrepor), com fundo branco e sem cor. Rode `npm run prep:bases` e depois confira as regiões com `npm run grid -- front 0 0 768 1376 overlay`. Se o tamanho mudar, ajuste `IMG` e `AXIS` em `src/anatomy/photo.ts`.
-- **Ajustar ou criar uma região** (`illustration`): edite `src/anatomy/photo-data.ts` com pontos em coordenadas da imagem, só do lado esquerdo. Use `S([...])` para curvas suaves e `OVER("M… Z")` para áreas sobre o shorts. Leia as coordenadas em `npm run grid -- <front|back> <x> <y> <largura> <altura>`.
-- **Novo músculo**: adicione o ID em `registry.ts`. Depois trace a região em `photo-data.ts` (`illustration`) e, se quiser os outros estilos, os paths em `FRONT` e/ou `BACK` no `paths.ts`, com coordenadas absolutas e x ≤ 100. Confira com `npm run figures`.
+- **Trocar ou adicionar uma pose** (`illustration`): veja "Como adicionar uma pose" acima.
+- **Ajustar uma região** (`illustration`): o mais simples é corrigir as cores no `<pose>.map.png`. Se o mapa não separa dois músculos, como o peitoral superior e o médio, crie um ajuste da pose em `scripts/prep-poses.ts`. Depois rode `npm run prep:poses` e confira com o `grid`.
+- **Novo músculo**: adicione o ID em `registry.ts`. Depois inclua a cor dele na paleta da pose (`illustration`). Para os outros estilos, desenhe os paths em `FRONT` e/ou `BACK` no `paths.ts`, com coordenadas absolutas e x ≤ 100. Confira com `npm run figures`.
 
 ### Outras notas
 
@@ -186,9 +202,10 @@ out/                  PNGs gerados (não versionado)
 
 ## Limitações conhecidas
 
-- **Shorts**: `quads`, `adductors`, `glutes` e `hamstrings` ficam em grande parte debaixo do shorts. Nesses casos o shorts é tingido com a cor do músculo, o que indica a região mas não desenha anatomia. Para um resultado melhor, gere outro par de imagens base com shorts curtos ou sunga.
-- **Uma pose só**: a base é a pose neutra, sem equipamentos. Halteres, barras e outras poses precisam de camadas ou imagens novas, e cada pose nova exige refazer as regiões.
-- **Regiões traçadas à mão**: algumas são aproximadas, principalmente os limites entre peitoral superior e médio, entre os deltoides e entre oblíquos e serrátil.
+- **Glúteo**: fica debaixo do shorts. O shorts é tingido com a cor do músculo, o que indica a região mas não desenha anatomia.
+- **Divisões geométricas**: algumas divisões são calculadas pela forma da região, sem vir de uma cor própria do mapa. Por isso são aproximadas:
+  - peitoral superior × médio: terço de cima de cada coluna;
+  - adutor: faixa interna do alto da coxa;
+  - panturrilha × tibial na vista de frente: lado interno × externo da perna.
+- **Poses com equipamento**: `assets/poses/hammer-curl.png` ainda não tem mapa de cores, então não está registrada.
 - **Texto longo**: os títulos se ajustam à largura, mas a altura não. Muitos itens ou descrições longas podem passar da área segura, então confira o PNG.
-#   t i k t o k - s l i d e s h o w - g e n e r a t o r  
- 

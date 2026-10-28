@@ -1,6 +1,6 @@
 {
   "id": "peito-top5",
-  "theme": { "accent": "#22c55e", "handle": "@seuperfil" },
+  "theme": { "accent": "#e11d2e", "handle": "@seuperfil" },
   "hook": {
     "kicker": "Guia de treino",
     "title": "Os 5 melhores\npara {peito}",

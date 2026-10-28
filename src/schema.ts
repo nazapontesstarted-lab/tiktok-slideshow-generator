@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { COLORS, colorValue, resolveMuscleRef, type Highlight, type MuscleRef } from "./anatomy";
+import { COLORS, POSE_NAMES, colorValue, resolveMuscleRef, type Highlight, type MuscleRef, type PoseName } from "./anatomy";
 
 // Aceita ID ("lats"), grupo ("shoulders") ou alias em PT ("dorsal", "ombros").
 const MuscleName = z.string().transform((value, ctx) => {
@@ -31,6 +31,9 @@ const HighlightGroup = z.object({
 });
 
 const View = z.enum(["auto", "front", "back", "both"]).default("auto");
+
+// Pose da ilustração (assets/poses). Quando definida, substitui o `view`.
+const Pose = z.enum(POSE_NAMES as [PoseName, ...PoseName[]]).optional();
 
 const figure = {
   muscles: Muscles.optional(),
@@ -86,6 +89,7 @@ const coverFields = {
   swipe: z.union([z.string(), z.literal(false)]).optional(),
   ...figure,
   view: View,
+  pose: Pose,
   ...common,
 };
 
@@ -158,6 +162,7 @@ const Exercise = z.object({
   tags: z.array(Tag).default([]),
   ...figure,
   view: View,
+  pose: Pose,
   // O que treina (se omitido, usa os nomes do primeiro grupo de destaque), séries, repetições e descanso.
   target: text,
   sets: Amount,
@@ -202,7 +207,7 @@ export const Slide = z.discriminatedUnion("type", [Cover, Anatomy, TierList, Ran
 
 export const Theme = z
   .object({
-    accent: z.string().regex(/^#[0-9a-fA-F]{6}$/, "use hex de 6 dígitos, ex: #22c55e").default("#22c55e"),
+    accent: z.string().regex(/^#[0-9a-fA-F]{6}$/, "use hex de 6 dígitos, ex: #e11d2e").default("#e11d2e"),
     handle: z.string().optional(),
     counter: z.boolean().default(true),
     progress: z.boolean().default(true),

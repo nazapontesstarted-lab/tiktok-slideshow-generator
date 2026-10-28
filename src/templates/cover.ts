@@ -22,5 +22,5 @@ export function cover(s: SlideOf<"cover">, theme: Theme): string {
     subtitle +
     swipe +
     `</div>`;
-  return side(text, figure(highlights, s.view, theme.figure, "", true));
+  return side(text, figure(highlights, s.view, theme.figure, "", true, s.pose));
 }

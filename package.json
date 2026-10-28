@@ -9,8 +9,9 @@
     "render": "tsx src/index.ts",
     "render:html": "tsx src/index.ts --html",
     "render:guides": "tsx src/index.ts --guides",
+    "render:final": "tsx src/index.ts --final",
     "figures": "tsx src/figures.ts",
-    "prep:bases": "tsx scripts/prep-bases.ts",
+    "prep:poses": "tsx scripts/prep-poses.ts",
     "grid": "tsx scripts/grid.ts",
     "typecheck": "tsc --noEmit"
   },

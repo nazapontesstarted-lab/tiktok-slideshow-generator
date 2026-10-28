@@ -57,5 +57,7 @@ export function themeVars(accent: string): string {
   const rgb = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
   // Versão escurecida do accent para texto sobre fundos claros (contraste).
   const ink = rgb.map((c) => Math.round(c * 0.62));
-  return `:root{--accent-rgb:${rgb.join(" ")};--accent-ink-rgb:${ink.join(" ")};}`;
+  // Fim do degradê dos títulos (o topo é o próprio accent).
+  const deep = rgb.map((c) => Math.round(c * 0.72));
+  return `:root{--accent-rgb:${rgb.join(" ")};--accent-ink-rgb:${ink.join(" ")};--accent-deep-rgb:${deep.join(" ")};}`;
 }

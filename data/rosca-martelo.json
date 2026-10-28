@@ -1,7 +1,7 @@
 {
   "id": "rosca-martelo",
   "theme": {
-    "accent": "#e0a526",
+    "accent": "#e11d2e",
     "handle": "@seuperfil",
     "figure": { "style": "illustration" }
   },
@@ -25,7 +25,7 @@
       "sets": 3,
       "reps": "10–12",
       "rest": "60s",
-      "benefits": ["Braço mais grosso", "Mais força de pegada"]
+      "benefits": ["Braço mais {grosso e forte}", "Mais força {de pegada}", "Perfeito para {espessura}"]
     },
     {
       "type": "anatomy",
@@ -34,8 +34,8 @@
       "view": "back",
       "highlight": [
         { "muscles": ["lats", "teres"], "color": "accent", "label": "Largura", "note": "Dorsal e redondo maior" },
-        { "muscles": ["traps", "rear-delts"], "color": "#f2cf7a", "label": "Espessura", "note": "Trapézio e deltoide posterior" },
-        { "muscles": ["lower-back"], "color": "#9a6b12", "label": "Estabilidade", "note": "Lombar" }
+        { "muscles": ["traps", "rear-delts"], "color": "#f59a9f", "label": "Espessura", "note": "Trapézio e deltoide posterior" },
+        { "muscles": ["lower-back"], "color": "#8f1420", "label": "Estabilidade", "note": "Lombar" }
       ]
     }
   ]

@@ -1,5 +1,5 @@
 import { BACK, DETAILS, EAR, FRONT, HEAD, SHORTS, SHORTS_LINES, SILHOUETTE, mirror } from "./paths";
-import { AXIS, IMG, PHOTO, dataUri } from "./photo";
+import { DEFAULT_POSE, POSES, poseHas, poseMeta, poseUri, type PoseName } from "./poses";
 import { MUSCLES, type BodyView, type MuscleId } from "./registry";
 
 export type Focus = "full" | "upper" | "lower";
@@ -14,10 +14,10 @@ export interface Highlight {
   note?: string;
 }
 
-// Cores da legenda. "accent" segue o tema (--accent-rgb), com fallback para o verde padrão.
+// Cores da legenda. "accent" segue o tema (--accent-rgb), com fallback para o vermelho padrão.
 export const COLORS = {
-  accent: "rgb(var(--accent-rgb, 34 197 94))",
-  "accent-soft": "rgb(var(--accent-rgb, 34 197 94) / 0.38)",
+  accent: "rgb(var(--accent-rgb, 225 29 46))",
+  "accent-soft": "rgb(var(--accent-rgb, 225 29 46) / 0.38)",
   blue: "#3b82f6",
   cyan: "#06b6d4",
   purple: "#a855f7",
@@ -40,7 +40,7 @@ export const colorValue = (c: string) => COLORS[c as ColorName] ?? c;
 export type FigureStyle = "illustration" | "lineart" | "flat";
 
 export interface FigureOptions {
-  /** illustration: base raster (assets/base-*.png) + músculos vetoriais por cima (padrão). */
+  /** illustration: ilustração raster da pose (assets/poses) + máscaras dos músculos por cima (padrão). */
   style?: FigureStyle;
   /** "auto": shorts no line art, exceto quando um músculo coberto por eles está destacado. Só vale para lineart. */
   shorts?: boolean | "auto";
@@ -52,8 +52,8 @@ export const ANATOMY_CSS =
   // illustration: a cor multiplica o desenho (traço e pontilhado continuam visíveis)
   ".anatomy--illustration .muscles{mix-blend-mode:multiply}" +
   ".anatomy--illustration .muscles--over{mix-blend-mode:normal}" +
-  ".anatomy--illustration .muscle path{fill:var(--hl);stroke:none}" +
-  ".anatomy--illustration .muscles--over path{opacity:.88}" +
+  ".anatomy--illustration .muscle rect{fill:var(--hl)}" +
+  ".anatomy--illustration .muscles--over rect{opacity:.85}" +
   // flat
   ".anatomy .skin path,.anatomy .head{fill:#eef0f3;stroke:#eef0f3;stroke-width:1.2;stroke-linejoin:round}" +
   ".anatomy .muscle path{fill:var(--hl,#dcdfe5);stroke:#fff;stroke-width:1.5;stroke-linejoin:round}" +
@@ -94,9 +94,10 @@ export function colorMap(highlights: Highlight[]): Map<MuscleId, string> {
 const allIds = (highlights: Highlight[]) => [...new Set(highlights.flatMap((h) => h.ids))];
 
 /** IDs destacados que não existem em nenhuma das vistas renderizadas (ex.: biceps só com "back"). */
-export function hiddenMuscles(highlights: Highlight[], views: BodyView[], style: FigureStyle = "illustration"): MuscleId[] {
-  const source = style === "illustration" ? PHOTO : { front: FRONT, back: BACK };
-  return allIds(highlights).filter((id) => !views.some((v) => source[v][id]));
+export function hiddenMuscles(highlights: Highlight[], views: BodyView[], style: FigureStyle = "illustration", pose?: PoseName): MuscleId[] {
+  const has = (v: BodyView, id: MuscleId) =>
+    style === "illustration" ? poseHas(pose ?? DEFAULT_POSE[v], id) : !!(v === "front" ? FRONT : BACK)[id];
+  return allIds(highlights).filter((id) => !views.some((v) => has(v, id)));
 }
 
 /** "auto": frente, costas ou ambas, conforme a melhor vista de cada músculo destacado. */
@@ -120,6 +121,8 @@ export function autoFocus(highlights: Highlight[]): Focus {
 
 export interface AnatomyOptions extends FigureOptions {
   view: BodyView;
+  /** Pose da ilustração (só no estilo illustration). Sem pose, usa a neutra da vista. */
+  pose?: PoseName;
   highlights?: Highlight[];
   focus?: Focus;
   className?: string;
@@ -143,50 +146,60 @@ const ellipse = (cls: string, e: { cx: number; cy: number; rx: number; ry: numbe
  *     <g class="details|contour|shorts">…</g>  (line art)
  *   Evite nomes de classe que coincidam com utilitários do Tailwind (ex.: "outline").
  */
-const PHOTO_VIEWBOX: Record<Focus, string> = {
-  full: "120 60 528 1275",
-  upper: "120 60 528 800",
-  lower: "120 560 528 775",
-};
+// Músculos que ficam debaixo do shorts: a região é o próprio shorts, tingido com blend normal
+// (multiplicar sobre o preto não mostraria a cor).
+const OVER_SHORTS: MuscleId[] = ["glutes"];
+
+/** viewBox a partir do bbox do corpo: corpo inteiro, metade de cima ou metade de baixo. */
+function poseViewBox(pose: PoseName, focus: Focus): string {
+  const { x, y, w, h } = poseMeta(pose).body;
+  const pad = 10;
+  const [top, bottom] =
+    focus === "upper" ? [y - pad, y + h * 0.6] : focus === "lower" ? [y + h * 0.42, y + h + pad] : [y - pad, y + h + pad];
+  return [x - pad, Math.round(top), w + 2 * pad, Math.round(bottom - top)].join(" ");
+}
 
 /**
- * Estilo "illustration": <image> da base + camada de músculos com mix-blend-mode multiply,
- * recortada pela máscara do corpo (assets/mask-*.png) para a cor nunca vazar do contorno.
+ * Estilo "illustration": <image> da pose + um <rect> por músculo destacado, recortado pela máscara
+ * dele (assets/poses/<pose>/<musculo>.png) e pintado com mix-blend-mode multiply, então o
+ * sombreamento da ilustração continua visível por baixo da cor.
  * Só os músculos destacados viram elementos; o resto já está desenhado na imagem.
  */
 function illustrationSvg(o: AnatomyOptions): string {
   const colors = colorMap(o.highlights ?? []);
-  const set = PHOTO[o.view];
-  const view = o.view;
+  const pose = o.pose ?? DEFAULT_POSE[o.view];
+  const meta = poseMeta(pose);
+  const view = POSES[pose].view;
+  const { w, h } = meta.size;
 
+  let defs = "";
   const layer = (over: boolean) =>
-    Object.entries(set)
-      .filter(([id]) => colors.has(id as MuscleId))
-      .map(([id, parts]) => {
-        const sel = parts!.filter((p) => !!p.overShorts === over);
-        if (!sel.length) return "";
-        const paths = sel
-          .map((p) =>
-            p.center
-              ? `<path d="${p.d}"/>`
-              : `<path data-side="left" d="${p.d}"/><path data-side="right" d="${mirror(p.d, AXIS)}"/>`,
-          )
-          .join("");
-        return `<g id="${over ? "" : id}" class="muscle is-active" data-muscle="${id}" style="--hl:${colors.get(id as MuscleId)}"><title>${MUSCLES[id as MuscleId].label}</title>${paths}</g>`;
+    [...colors]
+      .filter(([id]) => meta.muscles[id] && OVER_SHORTS.includes(id) === over)
+      .map(([id, color]) => {
+        const b = meta.muscles[id]!;
+        const mask = `mm-${pose}-${id}`;
+        defs +=
+          `<mask id="${mask}" maskUnits="userSpaceOnUse" x="0" y="0" width="${w}" height="${h}">` +
+          `<image href="${poseUri(pose, `${id}.png`)}" x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}"/></mask>`;
+        return (
+          `<g id="${over ? "" : id}" class="muscle is-active" data-muscle="${id}" style="--hl:${color}"><title>${MUSCLES[id].label}</title>` +
+          `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" mask="url(#${mask})"/></g>`
+        );
       })
       .join("");
 
+  const under = layer(false);
+  const over = layer(true);
   const ns = o.standalone ? ` xmlns="http://www.w3.org/2000/svg"` : "";
   const style = o.standalone ? `<style>${ANATOMY_CSS}</style>` : "";
-  const over = layer(true);
   return (
-    `<svg${ns} class="anatomy anatomy--illustration ${o.className ?? ""}" data-view="${view}" viewBox="${PHOTO_VIEWBOX[o.focus ?? "full"]}" preserveAspectRatio="xMidYMid meet">` +
+    `<svg${ns} class="anatomy anatomy--illustration ${o.className ?? ""}" data-view="${view}" data-pose="${pose}" viewBox="${poseViewBox(pose, o.focus ?? "full")}" preserveAspectRatio="xMidYMid meet">` +
     style +
-    `<defs><mask id="mk-${view}" maskUnits="userSpaceOnUse" x="0" y="0" width="${IMG.w}" height="${IMG.h}">` +
-    `<image href="${dataUri(`mask-${view}.png`)}" width="${IMG.w}" height="${IMG.h}"/></mask></defs>` +
-    `<image href="${dataUri(`figure-${view}.png`)}" width="${IMG.w}" height="${IMG.h}"/>` +
-    `<g class="muscles" mask="url(#mk-${view})">${layer(false)}</g>` +
-    (over ? `<g class="muscles muscles--over" mask="url(#mk-${view})">${over}</g>` : "") +
+    (defs ? `<defs>${defs}</defs>` : "") +
+    `<image href="${poseUri(pose, "figure.png")}" width="${w}" height="${h}"/>` +
+    (under ? `<g class="muscles">${under}</g>` : "") +
+    (over ? `<g class="muscles muscles--over">${over}</g>` : "") +
     `</svg>`
   );
 }

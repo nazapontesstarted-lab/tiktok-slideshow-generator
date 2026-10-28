@@ -28,6 +28,13 @@
   .h-title {
     @apply font-display font-normal uppercase leading-[0.94] tracking-[0.005em] text-ink;
   }
+  /* Palavras de destaque do título: degradê vertical do accent para um tom mais escuro. */
+  .h-title .text-accent {
+    background-image: linear-gradient(180deg, rgb(var(--accent-rgb)) 15%, rgb(var(--accent-deep-rgb)) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
   .subtitle {
     @apply text-[38px] font-medium leading-[1.3] tracking-[-0.01em] text-neutral-500;
   }

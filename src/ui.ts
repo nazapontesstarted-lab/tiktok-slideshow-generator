@@ -1,4 +1,13 @@
-import { anatomySvg, hiddenMuscles, resolveViews, type FigureOptions, type Highlight, type ViewOption } from "./anatomy";
+import {
+  POSES,
+  anatomySvg,
+  hiddenMuscles,
+  resolveViews,
+  type FigureOptions,
+  type Highlight,
+  type PoseName,
+  type ViewOption,
+} from "./anatomy";
 import type { Tag, Theme } from "./schema";
 
 export interface Ctx {
@@ -72,7 +81,12 @@ export function displayTitle(title: string, o: { max?: number; min?: number; cla
           return accent ? `<span class="text-accent">${esc(x.w)}</span>` : esc(x.w);
         })
         .join(" ");
-      return `<span class="block whitespace-nowrap" data-fit="${o.max ?? 120}" data-min="${o.min ?? 40}">${text}</span>`;
+      // O espaçamento entre linhas do título é bem apertado: acento em maiúscula sobe acima das
+      // letras (respiro em cima) e o Ç desce (respiro embaixo, no tamanho da própria linha).
+      const plain = words.map((x) => x.w).join("");
+      const gap =
+        (i > 0 && /[áéíóúâêôãõà]/i.test(plain) ? " pt-[0.24em]" : "") + (i < lastIdx && /ç/i.test(plain) ? " pb-[0.18em]" : "");
+      return `<span class="block whitespace-nowrap${gap}" data-fit="${o.max ?? 120}" data-min="${o.min ?? 40}">${text}</span>`;
     })
     .join("");
   return `<h2 class="h-title ${o.className ?? ""}" aria-label="${esc(title.replace(/[{}]/g, "").replace(/\n/g, " "))}">${html}</h2>`;
@@ -91,9 +105,18 @@ export function heading(o: { kicker?: string; title: string; subtitle?: string; 
  * Figura(s) anatômica(s) ocupando o espaço flexível restante.
  * `single`: no layout lateral, "auto" mostra só a melhor vista (frente ou costas), nunca as duas.
  */
-export function figure(highlights: Highlight[], view: ViewOption, fig: FigureOptions, className = "", single = false): string {
-  const views = resolveViews(view, highlights, !single);
-  const hidden = hiddenMuscles(highlights, views, fig.style);
+export function figure(
+  highlights: Highlight[],
+  view: ViewOption,
+  fig: FigureOptions,
+  className = "",
+  single = false,
+  pose?: PoseName,
+): string {
+  // Com pose, a vista é a da pose (e só no estilo illustration, que é o único com poses).
+  const usePose = pose && (fig.style ?? "illustration") === "illustration" ? pose : undefined;
+  const views = usePose ? [POSES[usePose].view] : resolveViews(view, highlights, !single);
+  const hidden = hiddenMuscles(highlights, views, fig.style, usePose);
   if (hidden.length) console.warn(`  ⚠ não aparecem na vista "${views.join("+")}": ${hidden.join(", ")} — use view "auto" ou "both"`);
   const captions = views.length > 1;
   return (
@@ -102,7 +125,7 @@ export function figure(highlights: Highlight[], view: ViewOption, fig: FigureOpt
       .map(
         (v) =>
           `<div class="flex-1 flex flex-col">` +
-          `<div class="relative flex-1 min-h-0">${anatomySvg({ view: v, highlights, ...fig, className: "absolute inset-0 w-full h-full" })}</div>` +
+          `<div class="relative flex-1 min-h-0">${anatomySvg({ view: v, pose: usePose, highlights, ...fig, className: "absolute inset-0 w-full h-full" })}</div>` +
           (captions
             ? `<div class="mt-5 text-center text-[22px] font-bold tracking-[0.18em] text-neutral-400">${v === "front" ? "FRENTE" : "COSTAS"}</div>`
             : "") +
@@ -128,16 +151,27 @@ export const ICONS = {
   cross: `<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>`,
   arrow: `<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>`,
   target: `<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>`,
+  plus: `<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`,
+  bars: `<line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="9"/><line x1="18" y1="20" x2="18" y2="4"/>`,
+  bolt: `<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>`,
 };
+
+/** Fundo em pincelada (bordas irregulares), esticado para cobrir o pai (que precisa ser posicionado). */
+export const brush = (cls: string) =>
+  `<svg class="absolute inset-0 h-full w-full ${cls}" viewBox="0 0 400 100" preserveAspectRatio="none" aria-hidden="true">` +
+  `<path fill="currentColor" d="M8 13 L22 6 L60 10 L95 4 L140 9 L185 3 L230 8 L275 4 L320 9 L360 5 L392 10 L386 24 L398 38 L390 52 L397 68 L388 82 L395 94 L350 90 L310 96 L262 91 L215 97 L170 92 L125 97 L80 92 L40 96 L6 91 L12 76 L2 60 L10 46 L3 30 Z"/>` +
+  `<path fill="currentColor" d="M300 0 L340 2 L330 5 Z M60 98 L100 100 L90 97 Z"/>` +
+  `</svg>`;
 
 export const icon = (name: keyof typeof ICONS, cls: string, stroke = 2.4) =>
   `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${stroke}" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]}</svg>`;
 
 /** Barra de CTA no rodapé da área segura. `{trecho}` fica na cor de destaque. */
 export const ctaBar = (text: string) =>
-  `<footer class="absolute inset-x-[64px] bottom-[340px] flex h-[108px] items-center gap-5 rounded-[30px] bg-ink px-9 text-white">` +
-  icon("bookmark", "h-[46px] w-[46px] shrink-0 text-accent", 2.4) +
-  `<div class="min-w-0 flex-1 text-center"><span class="block whitespace-nowrap font-display uppercase leading-none tracking-[0.03em]" data-fit="54" data-min="28">${rich(text)}</span></div>` +
+  `<footer class="absolute inset-x-[64px] bottom-[340px] flex h-[108px] items-center gap-5 px-9 text-white">` +
+  brush("text-ink") +
+  icon("bookmark", "relative h-[46px] w-[46px] shrink-0 text-accent", 2.4) +
+  `<div class="relative min-w-0 flex-1 text-center"><span class="block whitespace-nowrap font-display uppercase leading-none tracking-[0.03em]" data-fit="54" data-min="28">${rich(text)}</span></div>` +
   `</footer>`;
 
 const CTA_BAR_SPACE = 108 + 36; // altura da barra + respiro

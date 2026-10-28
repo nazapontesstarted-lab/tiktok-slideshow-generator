@@ -14,6 +14,10 @@ const args = process.argv.slice(2);
 const flags = new Set(args.filter((a) => a.startsWith("--")));
 const writeHtml = flags.has("--html");
 const guides = flags.has("--guides");
+// --final: versão para postar, em output/. Sem a flag, o render é de teste e vai para out/.
+const final = flags.has("--final");
+const OUT_ROOT = final ? "output" : "out";
+if (final && (guides || writeHtml)) throw new Error("--final não aceita --guides nem --html (são só para teste em out/)");
 
 async function loadDeck(file: string): Promise<Deck> {
   const json = JSON.parse(await readFile(file, "utf8"));
@@ -39,7 +43,7 @@ async function main() {
     for (const file of files) {
       const deck = await loadDeck(file);
       const slug = deck.id ?? basename(file, ".json");
-      const outDir = join("out", slug);
+      const outDir = join(OUT_ROOT, slug);
       await mkdir(outDir, { recursive: true });
       // Remove PNGs antigos para não sobrar slide de um render anterior maior.
       for (const f of await readdir(outDir)) if (/\.(png|html)$/.test(f)) await unlink(join(outDir, f));
