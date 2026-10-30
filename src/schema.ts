@@ -194,10 +194,20 @@ const List = z.object({
 });
 
 // O slide de CTA já é o fechamento: não ganha o rodapé de CTA.
+// `summary` transforma o fechamento em resumo + CTA: lista numerada dos itens do deck.
 const Cta = z.object({
   type: z.literal("cta"),
   title: z.string(),
   subtitle: text,
+  summary: z
+    .array(
+      z.union([
+        z.string().transform((title) => ({ title, text: undefined })),
+        z.object({ title: z.string(), text: text }),
+      ]),
+    )
+    .max(6)
+    .optional(),
   button: z.string().default("Salve para o próximo treino"),
   icon: z.enum(["bookmark", "share", "follow"]).default("bookmark"),
   ...common,

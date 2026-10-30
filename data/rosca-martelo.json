@@ -1,8 +1,6 @@
 {
   "id": "rosca-martelo",
   "theme": {
-    "accent": "#e11d2e",
-    "handle": "@seuperfil",
     "figure": { "style": "illustration" }
   },
   "hook": {

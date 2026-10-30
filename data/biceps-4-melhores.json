@@ -1,0 +1,81 @@
+{
+  "id": "biceps-4-melhores",
+  "hook": {
+    "kicker": "Bíceps",
+    "title": "4 melhores\nexercícios\npara {bíceps}",
+    "subtitle": "Os que mais constroem braço, em ordem.",
+    "muscles": { "primary": ["biceps"] },
+    "view": "front"
+  },
+  "slides": [
+    {
+      "type": "exercise",
+      "rank": 1,
+      "name": "Rosca\n{inclinada}",
+      "description": "Banco a 45°, braços para trás: o bíceps alonga no começo.",
+      "tags": ["Halter", { "label": "Isolado", "color": "gray" }],
+      "muscles": { "primary": ["biceps"], "secondary": ["forearms"] },
+      "view": "front",
+      "target": "Bíceps (cabeça longa)",
+      "sets": "3",
+      "reps": "10–12",
+      "rest": "60s",
+      "benefits": ["Maior {alongamento} do bíceps", "Pico de {braço mais alto}", "Pouca ajuda {do ombro}"]
+    },
+    {
+      "type": "exercise",
+      "rank": 2,
+      "name": "Rosca\n{direta}",
+      "description": "Barra reta ou W, cotovelos colados ao corpo.",
+      "tags": ["Barra", { "label": "Composto", "color": "gray" }],
+      "muscles": { "primary": ["biceps"], "secondary": ["forearms"] },
+      "view": "front",
+      "target": "Bíceps",
+      "sets": "3–4",
+      "reps": "8–10",
+      "rest": "90s",
+      "benefits": ["Mais {carga} no bíceps", "Base da {sobrecarga progressiva}", "Simples de {executar}"]
+    },
+    {
+      "type": "exercise",
+      "rank": 3,
+      "name": "Rosca\n{scott}",
+      "description": "Braços apoiados no banco, sem balançar o tronco.",
+      "tags": ["Barra ou halter", { "label": "Isolado", "color": "gray" }],
+      "muscles": { "primary": ["biceps"], "secondary": ["forearms"] },
+      "view": "front",
+      "target": "Bíceps (cabeça curta)",
+      "sets": "3",
+      "reps": "10–12",
+      "rest": "60s",
+      "benefits": ["Isola {o bíceps} de verdade", "Zero {roubo} de movimento", "Mais {espessura} no braço"]
+    },
+    {
+      "type": "exercise",
+      "rank": 4,
+      "name": "Rosca\n{martelo}",
+      "description": "Pegada neutra, cotovelos colados ao corpo.",
+      "tags": ["Halter", { "label": "Isolado", "color": "gray" }],
+      "muscles": { "primary": ["forearms"], "secondary": ["biceps"] },
+      "view": "front",
+      "target": "Braquial + antebraço",
+      "sets": "3",
+      "reps": "10–12",
+      "rest": "60s",
+      "benefits": ["Braço mais {grosso e forte}", "Mais força {de pegada}", "Completa {o volume} do braço"]
+    },
+    {
+      "type": "cta",
+      "title": "Resumo do\n{treino de bíceps}",
+      "subtitle": "Faça os 4 na ordem e some as séries.",
+      "summary": [
+        { "title": "Rosca {inclinada}", "text": "3×10–12 · 60s" },
+        { "title": "Rosca {direta}", "text": "3–4×8–10 · 90s" },
+        { "title": "Rosca {scott}", "text": "3×10–12 · 60s" },
+        { "title": "Rosca {martelo}", "text": "3×10–12 · 60s" }
+      ],
+      "button": "Salve e siga para mais treinos",
+      "icon": "bookmark"
+    }
+  ]
+}

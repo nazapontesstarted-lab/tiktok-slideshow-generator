@@ -1,0 +1,55 @@
+{
+  "id": "peito-5-melhores",
+  "hook": {
+    "kicker": "Peito",
+    "title": "5 melhores\nexercícios\npara {peito}",
+    "subtitle": "Ranqueados por ativação, carga e segurança.",
+    "muscles": { "primary": ["peito"] },
+    "view": "front"
+  },
+  "slides": [
+    {
+      "type": "anatomy",
+      "kicker": "Anatomia",
+      "title": "Peito em\n{2 partes}",
+      "view": "front",
+      "highlight": [
+        { "muscles": ["upper-chest"], "color": "accent", "label": "Peitoral superior", "note": "Inclinados de 30° a 45°" },
+        { "muscles": ["mid-chest"], "color": "#f59a9f", "label": "Peitoral médio e inferior", "note": "Supino reto, paralelas e crucifixo" }
+      ]
+    },
+    {
+      "type": "ranking",
+      "kicker": "Ranking",
+      "title": "Top 5 para {peito}",
+      "items": [
+        { "name": "Supino inclinado", "description": "Peito superior, a parte que mais falta", "score": 9.6, "tags": ["Halter", { "label": "Composto", "color": "gray" }], "muscles": { "primary": ["upper-chest"], "secondary": ["mid-chest"] } },
+        { "name": "Supino reto", "description": "O rei da sobrecarga progressiva", "score": 9.3, "tags": ["Barra", { "label": "Composto", "color": "gray" }], "muscles": { "primary": ["mid-chest"], "secondary": ["upper-chest"] } },
+        { "name": "Paralelas", "description": "Tronco inclinado à frente", "score": 8.8, "tags": ["Peso corporal"], "muscles": { "primary": ["mid-chest"], "secondary": ["front-delts"] } },
+        { "name": "Crossover", "description": "Tensão constante na amplitude toda", "score": 8.5, "tags": ["Cabo", { "label": "Isolado", "color": "gray" }], "muscles": { "primary": ["mid-chest"] } },
+        { "name": "Flexão de braço", "description": "Sem equipamento, fácil de progredir", "score": 8.0, "tags": ["Peso corporal"], "muscles": { "primary": ["mid-chest"], "secondary": ["abs"] } }
+      ]
+    },
+    {
+      "type": "exercise",
+      "rank": 1,
+      "name": "Supino\n{inclinado}",
+      "description": "Banco a 30°, halteres descendo até a linha do peito.",
+      "tags": ["Halter", { "label": "Composto", "color": "gray" }],
+      "muscles": { "primary": ["upper-chest"], "secondary": ["mid-chest", "front-delts"] },
+      "view": "front",
+      "target": "Peitoral superior",
+      "sets": "3–4",
+      "reps": "8–12",
+      "rest": "90s",
+      "benefits": ["Peito superior {mais cheio}", "Menos estresse {no ombro}", "Corrige o peito {\"caído\"}"]
+    },
+    {
+      "type": "cta",
+      "title": "Salve e use no\n{próximo treino}",
+      "subtitle": "Siga para mais rankings de exercícios toda semana.",
+      "button": "Salvar treino de peito",
+      "icon": "bookmark"
+    }
+  ]
+}

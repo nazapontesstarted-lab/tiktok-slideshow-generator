@@ -28,14 +28,43 @@ Saída: `out/<id>/01-cover.png`, `02-anatomy.png`, …
 
 Os arquivos antigos da mesma pasta são apagados a cada render.
 
-Exemplos prontos em `data/`: `peito-top5.json` (todos os tipos de slide), `costas-guia.json` (vista de costas e grupos coloridos) e `rosca-martelo.json` (no estilo da referência). O destaque padrão é o vermelho `#e11d2e`.
+Exemplos prontos em `data/` (todos versionados):
+- `peito-5-melhores.json`: o post P1 (capa, anatomia, ranking, exercício e CTA).
+- `biceps-4-melhores.json`: o modelo **capa → exercícios → resumo + CTA**.
+- `peito-top5.json` (todos os tipos de slide), `costas-guia.json` (vista de costas e grupos coloridos) e `rosca-martelo.json` (no estilo da referência).
+
+### Marca (`brand/brand.json`)
+
+`handle`, `accent` e `cta` valem para todos os decks. O `theme` do deck sobrescreve o que mudar. Sem o arquivo, o gerador usa os padrões do schema.
+
+```json
+{ "handle": "@treinaforte", "accent": "#e11d2e", "cta": "SALVE ISSO {PARA DEPOIS!}" }
+```
+
+O `brand/brand.md` é só o texto de referência da marca. A pasta `brand/` está no `.gitignore`, então não vai para o repositório.
+
+### Sequência recomendada do slideshow
+
+1. **Capa**: o `hook` do deck.
+2. **2 a n**: um slide `exercise` por exercício, com `rank` de 1 a n.
+3. **Último**: slide `cta` com `summary` (resumo dos exercícios) e o botão de fechamento.
+
+```json
+{ "type": "cta", "title": "Resumo do\n{treino de bíceps}", "summary": [{ "title": "Rosca {direta}", "text": "3×8–10 · 90s" }], "button": "Salve e siga para mais treinos" }
+```
+
+Sem `summary`, o `cta` continua o fechamento simples (ícone grande e botão).
+
+### Controle de posts
+
+`content/posts.csv` (separador `;`, UTF-8 com BOM) registra cada post: pasta em `output/`, data, link, legenda, métricas e status.
 
 ## Estrutura do JSON
 
 ```json
 {
   "id": "peito-top5",
-  "theme": { "accent": "#e11d2e", "handle": "@seuperfil", "titleFont": "anton", "cta": "SALVE ISSO {PARA DEPOIS!}" },
+  "theme": { "titleFont": "anton", "cta": "SALVE ISSO {PARA DEPOIS!}" },
   "hook": { "title": "Os 5 melhores\npara {peito}", "muscles": { "primary": ["chest"] }, "view": "front" },
   "slides": [ { "type": "exercise", ... } ]
 }
@@ -165,7 +194,7 @@ O JSON é validado com zod, e os erros indicam o caminho exato (ex.: `slides.3.i
 
 ```
 src/
-  index.ts            CLI: lê JSON → HTML → Tailwind → Playwright screenshot
+  index.ts            CLI: lê JSON (+ brand/brand.json) → HTML → Tailwind → Playwright screenshot
   figures.ts          exporta SVGs avulsos e o mapa de músculos
   schema.ts           validação (zod); highlightsOf() normaliza muscles/highlight
   anatomy/
@@ -184,8 +213,12 @@ assets/poses/
   <pose>.png          ilustração original (tons de cinza, fundo branco)
   <pose>.map.png      mesma pose com cada músculo numa cor chapada
   <pose>/             gerado: figure.png (fundo transparente), <musculo>.png e meta.json
-data/                 carrosséis em JSON
-out/                  PNGs gerados (não versionado)
+data/                 carrosséis em JSON (versionados)
+brand/                brand.json (handle, cor e CTA, lido pelo código) e brand.md; ignorado pelo git
+content/              posts.csv: controle dos posts no TikTok
+docs/prompts/         Poses-50.md: prompts das 50 poses de exercícios para gerar as imagens
+out/                  PNGs de teste (não versionado)
+output/               P<n>_<Assunto>/ com os slideshows para postar (não versionado)
 ```
 
 ### Como alterar a figura

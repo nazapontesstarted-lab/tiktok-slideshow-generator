@@ -1,9 +1,5 @@
 {
   "id": "costas-guia",
-  "theme": {
-    "accent": "#e11d2e",
-    "handle": "@seuperfil"
-  },
   "hook": {
     "kicker": "Anatomia",
     "title": "Costas largas\nguia {completo}",

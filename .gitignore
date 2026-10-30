@@ -1,6 +1,6 @@
 node_modules/
 out/
 output/
-Modelos/
-data/
 LOG.md
+brand/
+.claude/

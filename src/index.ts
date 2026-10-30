@@ -19,8 +19,19 @@ const final = flags.has("--final");
 const OUT_ROOT = final ? "output" : "out";
 if (final && (guides || writeHtml)) throw new Error("--final não aceita --guides nem --html (são só para teste em out/)");
 
+// Marca (brand/brand.json): handle, cor e CTA padrão de todos os decks. O `theme` do deck sobrescreve.
+async function loadBrand(): Promise<Record<string, unknown>> {
+  try {
+    return JSON.parse(await readFile(join("brand", "brand.json"), "utf8"));
+  } catch (e) {
+    if ((e as NodeJS.ErrnoException).code === "ENOENT") return {};
+    throw new Error(`brand/brand.json inválido: ${(e as Error).message}`);
+  }
+}
+
 async function loadDeck(file: string): Promise<Deck> {
   const json = JSON.parse(await readFile(file, "utf8"));
+  json.theme = { ...(await loadBrand()), ...json.theme };
   const parsed = Deck.safeParse(json);
   if (!parsed.success) {
     const issues = parsed.error.issues.map((i) => `  • ${i.path.join(".") || "(raiz)"}: ${i.message}`).join("\n");
